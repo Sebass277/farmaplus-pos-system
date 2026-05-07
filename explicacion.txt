@@ -1,0 +1,24 @@
+# NOVA SALUD - RESPALDO VERSIÓN 2 (v2)
+Fecha: 06/05/2026
+
+## 📌 NOVEDADES DE ESTA VERSIÓN:
+- **Identidad Renovada:** Cambio total de FarmaPlus a "Nova Salud".
+- **Landing Page Integrada:** Carrusel de ofertas responsivo (Desktop/Mobile) en la raíz.
+- **UX Móvil Optimizada:** 
+    - Catálogo en 2 columnas para celulares.
+    - Menú de usuario "Dropdown" (desplegable) para ahorrar espacio.
+    - Notificaciones "Toast" rápidas al agregar productos.
+- **Sistema de Carrito Pro:** Página dedicada (/carrito) con resumen detallado y flujo de pago.
+- **Footer Corporativo:** Pie de página con redes sociales, contacto y créditos.
+
+## 🚀 ESTRUCTURA
+- /backend: API, Base de Datos SQLite (farmacia.db) y WebSockets.
+- /frontend: React + Vite + Lucide Icons + jsPDF.
+
+## 🛠️ RESTAURACIÓN
+1. `cd backend` -> `npm install` -> `npm start`
+2. `cd frontend` -> `npm install` -> `npm run dev`
+
+## 🔑 ACCESOS
+- Admin: admin / admin123
+- Cajero: cashier / cashier123
