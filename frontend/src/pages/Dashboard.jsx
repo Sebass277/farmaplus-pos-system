@@ -264,7 +264,7 @@ const Dashboard = ({ user, socket }) => {
                 {products.map(p => (
                   <div key={p.id} className="pos-card fade-in" onClick={() => addToPosCart(p)}>
                     <div className="pos-card-img">
-                      <img src={p.imagen} alt={p.nombre} />
+                      <img src={p.imagen.startsWith('http') ? p.imagen : `${API_URL}${p.imagen}`} alt={p.nombre} />
                     </div>
                     <div className="pos-card-content">
                       <h4 className="pos-card-title">{p?.nombre || 'Producto sin nombre'}</h4>
