@@ -1,0 +1,22 @@
+🚀 GUÍA DE ENTREGA - NOVA SALUD POS SYSTEM
+
+¡Hola! Para ver el sistema funcionando en tiempo real conectado a esta base de datos local, sigue estos pasos:
+
+1. ABRIR EL BACKEND:
+   - Entra a la carpeta 'backend'.
+   - Ejecuta: npm install
+   - Luego ejecuta: npm run bridge
+
+2. COPIAR EL ENLACE:
+   - En la consola aparecerá un enlace azul (ej: https://fancy-pumas-jump.loca.lt).
+   - CÓPIALO.
+
+3. CONECTAR LA WEB:
+   - Abre la web desplegada (en Vercel/Render).
+   - Inicia sesión como ADMINISTRADOR (admin / admin123).
+   - Ve a la pestaña 'Puente API' (al final del menú lateral).
+   - Pega el enlace y haz clic en 'CONECTAR PUENTE'.
+
+¡Listo! La web ahora mostrará los datos de esta computadora.
+
+Desarrollado por Sebass277 & Antigravity AI.
