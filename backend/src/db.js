@@ -97,11 +97,42 @@ async function initDb() {
         fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(product_id) REFERENCES products(id)
       )`);
+      
+      console.log('✅ Estructura de base de datos lista.');
+      seedDatabase(db);
     });
-    console.log('✅ Esquema de base de datos v3.0 listo.');
   } catch (err) {
     console.error('❌ Error al inicializar esquema:', err);
   }
+}
+
+// Función para auto-poblar la base de datos si está vacía (v3.0)
+function seedDatabase(db) {
+    db.get("SELECT COUNT(*) as count FROM users", (err, row) => {
+        if (row && row.count === 0) {
+            console.log('🌱 Poblando usuarios iniciales...');
+            const adminPass = require('bcryptjs').hashSync('admin123', 10);
+            const cajeroPass = require('bcryptjs').hashSync('cajero123', 10);
+            db.run("INSERT INTO users (id, username, password, role) VALUES (?, ?, ?, ?)", ['USR-001', 'admin', adminPass, 'Administrador']);
+            db.run("INSERT INTO users (id, username, password, role) VALUES (?, ?, ?, ?)", ['USR-002', 'cajero', cajeroPass, 'Cajero']);
+        }
+    });
+
+    db.get("SELECT COUNT(*) as count FROM products", (err, row) => {
+        if (row && row.count === 0) {
+            console.log('🌱 Poblando productos iniciales...');
+            const products = [
+                ['PROD-001', 'Protector Solar Facial en Gel Crema Eucerin Oil Control FPS50+', 95.50, '50ml', '/images/protector.jpg', 100, 10, '7750123456789', 'L-001'],
+                ['PROD-002', 'Repuesto Gel Hidratante Facial Hydro Boost Neutrogena', 65.20, '50g', '/images/neutrogena.jpg', 50, 5, '7750987654321', 'L-002'],
+                ['PROD-003', 'Bismutol 87.33mg/5 ml Suspensión Oral', 18.50, '150ml', '/images/bismutol.jpg', 30, 8, '7750111222333', 'L-003'],
+                ['PROD-004', 'DoloMejoral 550 mg tableta recubierta', 1.50, '1 Tableta', '/images/dolomejoral.jpg', 200, 50, '7750444555666', 'L-004'],
+                ['PROD-005', 'Dolo Neurobion Forte NF', 5.80, '1 Ampolla', '/images/doloneurobion.jpg', 150, 20, '7750777888999', 'L-005']
+            ];
+            const stmt = db.prepare("INSERT INTO products (id, nombre, precio, unidad, imagen, stock_actual, stock_minimo, codigo_barras, lote) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            products.forEach(p => stmt.run(p));
+            stmt.finalize();
+        }
+    });
 }
 
 module.exports = { db, dbAsync, initDb };
