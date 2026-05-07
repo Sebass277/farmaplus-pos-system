@@ -69,7 +69,7 @@ const Cart = ({ cart, removeFromCart, clearCart, user }) => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {cart.map(item => (
           <div key={item.id} className="glass" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-            <img src={item.imagen} alt={item.nombre} style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
+            <img src={item.imagen.startsWith('http') ? item.imagen : `${API_URL}${item.imagen}`} alt={item.nombre} style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
             <div style={{ flex: 1, minWidth: '200px' }}>
               <h3 style={{ fontSize: '1.1rem', fontWeight: '800' }}>{item.nombre}</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{item.unidad}</p>
