@@ -45,6 +45,7 @@ router.post('/', (req, res) => {
       }
       db.run('COMMIT');
       console.log(`✅ VENTA REGISTRADA: ID ${sale_id} | Total: S/ ${total} | Tipo: ${tipo}`);
+      req.io.emit('products_updated'); // Notificar a todos los clientes
       res.json({ message: 'Venta registrada con éxito', sale_id });
     });
   });

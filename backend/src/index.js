@@ -10,6 +10,13 @@ const productRoutes = require('./routes/products');
 const saleRoutes = require('./routes/sales');
 
 const app = express();
+
+// Espía de peticiones (DEBUG)
+app.use((req, res, next) => {
+  console.log(`📡 RECIBIDO: ${req.method} ${req.url}`);
+  next();
+});
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -46,6 +53,12 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
+});
+
+// Catch-all para rutas no encontradas (Evita errores HTML 404)
+app.use((req, res) => {
+  console.log(`[404] Ruta no encontrada: ${req.method} ${req.url}`);
+  res.status(404).json({ error: `La ruta ${req.method} ${req.url} no existe en el servidor.` });
 });
 
 const PORT = process.env.PORT || 5000;

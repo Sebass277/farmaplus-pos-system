@@ -26,11 +26,19 @@ const Cart = ({ cart, removeFromCart, clearCart, user }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(saleData)
     })
-    .then(res => res.json())
+    .then(async res => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error al procesar el pedido');
+        return data;
+    })
     .then(() => {
-      alert('¡Gracias por tu compra! Tu pedido está en camino.');
+      alert('¡✅ Gracias por tu compra! Tu pedido está en camino.');
       clearCart();
       navigate('/');
+    })
+    .catch(err => {
+        console.error(err);
+        alert(`❌ Error en el pedido: ${err.message}`);
     });
   };
 

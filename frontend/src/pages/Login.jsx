@@ -84,7 +84,7 @@ const Login = ({ setUser }) => {
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: '1.6' }}>
               <strong>Cuentas de prueba:</strong><br/>
               Admin: admin / admin123<br/>
-              Cajero: cashier / cashier123
+              Cajero: cajero / cajero123
             </p>
         </div>
       </form>

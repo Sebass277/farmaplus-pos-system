@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Cart from './pages/Cart';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import AIAssistant from './components/AIAssistant';
 import { io } from 'socket.io-client';
 
 import API_URL from './api';
@@ -60,12 +61,12 @@ function App() {
         
         <main style={{ flex: 1 }}>
           <Routes>
-            <Route path="/" element={<Ecommerce addToCart={addToCart} />} />
+            <Route path="/" element={<Ecommerce addToCart={addToCart} socket={socket} />} />
             <Route path="/carrito" element={<Cart cart={cart} removeFromCart={removeFromCart} clearCart={clearCart} user={user} />} />
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route 
               path="/dashboard/*" 
-              element={user && (user.role === 'Administrador' || user.role === 'Cajero') ? <Dashboard user={user} /> : <Navigate to="/login" />} 
+              element={user && (user.role === 'Administrador' || user.role === 'Cajero') ? <Dashboard user={user} socket={socket} /> : <Navigate to="/login" />} 
             />
           </Routes>
         </main>
@@ -89,6 +90,7 @@ function App() {
             </div>
           ))}
         </div>
+        <AIAssistant />
       </div>
     </Router>
   );

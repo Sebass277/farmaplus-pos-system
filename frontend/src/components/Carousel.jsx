@@ -1,21 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const Carousel = () => {
+const Carousel = ({ products, addToCart }) => {
   const [current, setCurrent] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // Imágenes de ejemplo (el usuario las reemplazará por sus diseños)
+  const handleBannerAction = (slide) => {
+    if (slide.productId && addToCart && products) {
+      const product = products.find(p => p.id === slide.productId);
+      if (product) {
+        addToCart(product);
+      }
+    }
+  };
+
   const slides = [
     {
-      desktop: "https://images.unsplash.com/photo-1587854692152-cbe660dbbb88?auto=format&fit=crop&q=80&w=1470",
-      mobile: "https://images.unsplash.com/photo-1587854692152-cbe660dbbb88?auto=format&fit=crop&q=80&w=600",
-      title: "Ofertas de Verano"
+      desktop: '/banners/desktop1.png',
+      mobile: '/banners/desktop1.png',
+      title: 'Nova Salud - Tu Bienestar'
     },
     {
-      desktop: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&q=80&w=1470",
-      mobile: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&q=80&w=600",
-      title: "Cuidado Personal"
+      desktop: '/banners/desktop2.jpg',
+      mobile: '/banners/desktop2.jpg',
+      title: 'Oferta: Protector Eucerin',
+      productId: 'PROD-001' // ID del Protector Solar
     }
   ];
 
@@ -43,8 +52,14 @@ const Carousel = () => {
               className="carousel-image"
             />
             <div className="carousel-caption">
-              <h2>{slide.title}</h2>
-              <button className="btn-orange">Ver Ofertas</button>
+              <h2 style={{ fontSize: isMobile ? '1.5rem' : '2.5rem', fontWeight: '900', color: 'white', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{slide.title}</h2>
+              <button 
+                className="btn-orange" 
+                onClick={() => handleBannerAction(slide)}
+                style={{ padding: '15px 30px', borderRadius: '30px', fontWeight: '800' }}
+              >
+                {slide.productId ? 'Añadir a la Bolsa' : 'Ver Catálogo'}
+              </button>
             </div>
           </div>
         ))}

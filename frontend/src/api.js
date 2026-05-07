@@ -1,14 +1,13 @@
 // api.js - Configuración dinámica de la API
 const getApiUrl = () => {
-    // 1. Prioridad: Enlace manual guardado por el administrador
+    let url = 'http://localhost:5000';
+    
     const savedBridge = localStorage.getItem('nova_salud_bridge');
-    if (savedBridge) return savedBridge;
+    if (savedBridge) url = savedBridge;
+    else if (import.meta.env.VITE_API_URL) url = import.meta.env.VITE_API_URL;
 
-    // 2. Variable de entorno (para despliegue fijo)
-    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-
-    // 3. Fallback: localhost
-    return 'http://localhost:5000';
+    // Limpieza: Quitar barra final si existe
+    return url.endsWith('/') ? url.slice(0, -1) : url;
 };
 
 const API_URL = getApiUrl();
