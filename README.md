@@ -55,7 +55,7 @@ SQLite Database
 
 ## 📸 Vista del sistema
 
-![Vista Previa de Nova Salud](preview.png)
+*(Vista previa próximamente)*
 
 ---
 
