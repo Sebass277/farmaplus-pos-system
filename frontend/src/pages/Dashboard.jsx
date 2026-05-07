@@ -109,17 +109,20 @@ const Dashboard = ({ user, socket }) => {
       return;
     }
 
-    const total = posCart.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
     const saleData = {
       user_id: user.id,
-      items: posCart,
-      total,
+      items: posCart.map(item => ({ id: item.id, cantidad: item.cantidad })), // Solo IDs y cantidades
       tipo: 'Manual'
     };
 
+    const token = localStorage.getItem('token');
+
     fetch(`${API_URL}/api/sales`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(saleData)
     })
     .then(async res => {
@@ -128,11 +131,12 @@ const Dashboard = ({ user, socket }) => {
       return data;
     })
     .then(data => {
-      generatePDF(data.sale_id, posCart, total);
+      // El total ahora viene del servidor
+      generatePDF(data.sale_id, posCart, data.total);
       setPosCart([]);
       fetchProducts();
       fetchReports();
-      alert('✅ Venta registrada con éxito');
+      alert(`✅ Venta registrada con éxito. Total: S/ ${data.total.toFixed(2)}`);
     })
     .catch(err => {
       console.error(err);
@@ -163,40 +167,43 @@ const Dashboard = ({ user, socket }) => {
       return;
     }
     
-    // Si tiene ID, es una actualización (reposición)
     const isUpdate = !!newProduct.id;
     const url = isUpdate ? `${API_URL}/api/products/${newProduct.id}` : `${API_URL}/api/products`;
     const method = isUpdate ? 'PUT' : 'POST';
-
-    console.log(`🚀 Enviando petición a ${url} con método ${method}...`);
+    const token = localStorage.getItem('token');
 
     fetch(url, {
         method: method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(newProduct)
     })
-    .then(res => res.json())
+    .then(async res => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error en la operación');
+        return data;
+    })
     .then(data => {
-        if (data.error) {
-            alert(`❌ Error: ${data.error}`);
-        } else {
-            alert(isUpdate ? '¡Stock actualizado correctamente! ✅' : '¡Producto creado exitosamente! ✅');
-            setNewProduct({ nombre: '', precio: '', unidad: '', imagen: '', stock_actual: 10, stock_minimo: 5, codigo_barras: '', lote: '' });
-            fetchProducts();
-        }
+        alert(isUpdate ? '¡Stock actualizado correctamente! ✅' : '¡Producto creado exitosamente! ✅');
+        setNewProduct({ nombre: '', precio: '', unidad: '', imagen: '', stock_actual: 10, stock_minimo: 5, codigo_barras: '', lote: '' });
+        fetchProducts();
     })
     .catch(err => {
-        console.error('🔥 Error fatal en fetch:', err);
-        alert(`❌ Error crítico de conexión: ${err.message}`);
+        alert(`❌ Error: ${err.message}`);
     });
   };
 
   const handleDeleteProduct = (id) => {
     if (window.confirm('¿Estás seguro de eliminar este producto? Esta acción no se puede deshacer.')) {
-        const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-        const url = `${baseUrl}/api/products/${id}`;
+        const url = `${API_URL}/api/products/${id}`;
+        const token = localStorage.getItem('token');
 
-        fetch(url, { method: 'DELETE' })
+        fetch(url, { 
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
         .then(async res => {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Error al eliminar');

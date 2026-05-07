@@ -1,73 +1,109 @@
 const express = require('express');
 const router = express.Router();
-const { db } = require('../db');
+const { db, dbAsync } = require('../db');
+const { v4: uuidv4 } = require('uuid');
+const { verifyToken, isAdmin } = require('../middleware/auth');
 
-router.get('/', (req, res) => {
-  db.all('SELECT * FROM products', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
+// Listar solo productos activos (Público)
+router.get('/', async (req, res) => {
+  try {
+    const rows = await dbAsync.all("SELECT * FROM products WHERE status = 'active'");
     res.json(rows);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-router.get('/:id', (req, res) => {
-  db.get('SELECT * FROM products WHERE id = ?', [req.params.id], (err, row) => {
-    if (err) return res.status(500).json({ error: err.message });
+router.get('/:id', async (req, res) => {
+  try {
+    const row = await dbAsync.get('SELECT * FROM products WHERE id = ?', [req.params.id]);
     res.json(row);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-router.post('/', (req, res) => {
+// Obtener historial de movimientos de un producto
+router.get('/:id/movements', async (req, res) => {
+    try {
+        const rows = await dbAsync.all('SELECT * FROM inventory_movements WHERE product_id = ? ORDER BY fecha DESC', [req.params.id]);
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.post('/', verifyToken, isAdmin, async (req, res) => {
   const { nombre, precio, unidad, imagen, stock_actual, stock_minimo, codigo_barras, lote } = req.body;
   const id = `PROD-${Math.floor(1000 + Math.random() * 9000)}`;
-  console.log(`[POST] Creando nuevo producto: ${nombre}`);
   
-  db.run(
-    'INSERT INTO products (id, nombre, precio, unidad, imagen, stock_actual, stock_minimo, codigo_barras, lote) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [id, nombre, precio, unidad, imagen, stock_actual, stock_minimo, codigo_barras, lote],
-    function(err) {
-      if (err) return res.status(500).json({ error: err.message });
-      req.io.emit('products_updated');
-      res.json({ message: 'Producto agregado', id });
-    }
-  );
+  try {
+    await dbAsync.run('BEGIN TRANSACTION');
+    
+    await dbAsync.run(
+      'INSERT INTO products (id, nombre, precio, unidad, imagen, stock_actual, stock_minimo, codigo_barras, lote, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [id, nombre, precio, unidad, imagen, stock_actual, stock_minimo, codigo_barras, lote, 'active']
+    );
+
+    // Registro inicial de inventario
+    await dbAsync.run(
+      'INSERT INTO inventory_movements (id, product_id, tipo, cantidad, motivo) VALUES (?, ?, ?, ?, ?)',
+      [uuidv4(), id, 'ENTRADA', stock_actual, 'CARGA INICIAL']
+    );
+
+    await dbAsync.run('COMMIT');
+    req.io.emit('products_updated');
+    res.json({ message: 'Producto creado y registrado', id });
+  } catch (err) {
+    await dbAsync.run('ROLLBACK');
+    res.status(500).json({ error: err.message });
+  }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   const { id } = req.params;
   const { nombre, precio, unidad, imagen, stock_actual, stock_minimo, codigo_barras, lote } = req.body;
-  console.log(`[PUT] Actualizando producto ID: ${id}`);
+  const cantidadNueva = parseInt(stock_actual) || 0;
 
-  db.run(
-    `UPDATE products SET 
-      nombre = ?,
-      precio = ?, 
-      unidad = ?,
-      imagen = ?,
-      stock_actual = stock_actual + ?, 
-      stock_minimo = ?, 
-      codigo_barras = ?, 
-      lote = ? 
-     WHERE id = ?`,
-    [nombre, precio, unidad, imagen, parseInt(stock_actual) || 0, stock_minimo, codigo_barras, lote, id],
-    function(err) {
-      if (err) {
-        console.error(`[PUT Error]: ${err.message}`);
-        return res.status(500).json({ error: err.message });
-      }
-      console.log(`[PUT Success]: Producto ${id} actualizado completamente.`);
-      req.io.emit('products_updated');
-      res.json({ message: 'Producto actualizado con éxito' });
+  try {
+    await dbAsync.run('BEGIN TRANSACTION');
+
+    // Actualizar datos del producto
+    await dbAsync.run(
+      `UPDATE products SET 
+        nombre = ?, precio = ?, unidad = ?, imagen = ?,
+        stock_actual = stock_actual + ?, 
+        stock_minimo = ?, codigo_barras = ?, lote = ? 
+       WHERE id = ?`,
+      [nombre, precio, unidad, imagen, cantidadNueva, stock_minimo, codigo_barras, lote, id]
+    );
+
+    // Registrar el movimiento de reposición si hubo cambio en stock
+    if (cantidadNueva !== 0) {
+        await dbAsync.run(
+            'INSERT INTO inventory_movements (id, product_id, tipo, cantidad, motivo) VALUES (?, ?, ?, ?, ?)',
+            [uuidv4(), id, cantidadNueva > 0 ? 'ENTRADA' : 'SALIDA', Math.abs(cantidadNueva), 'REPOSICIÓN/AJUSTE MANUAL']
+        );
     }
-  );
+
+    await dbAsync.run('COMMIT');
+    req.io.emit('products_updated');
+    res.json({ message: 'Producto y movimientos actualizados' });
+  } catch (err) {
+    await dbAsync.run('ROLLBACK');
+    res.status(500).json({ error: err.message });
+  }
 });
 
-router.delete('/:id', (req, res) => {
-  const { id } = req.params;
-  db.run('DELETE FROM products WHERE id = ?', [id], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
+// Borrado Lógico para mantener integridad referencial
+router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
+  try {
+    await dbAsync.run("UPDATE products SET status = 'inactive' WHERE id = ?", [req.params.id]);
     req.io.emit('products_updated');
-    res.json({ message: 'Producto eliminado' });
-  });
+    res.json({ message: 'Producto desactivado (Historial preservado)' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

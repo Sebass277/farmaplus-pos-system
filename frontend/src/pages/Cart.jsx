@@ -16,14 +16,18 @@ const Cart = ({ cart, removeFromCart, clearCart, user }) => {
 
     const saleData = {
       user_id: user.id,
-      items: cart,
-      total,
+      items: cart.map(item => ({ id: item.id, cantidad: item.cantidad })),
       tipo: 'Ecommerce'
     };
 
+    const token = localStorage.getItem('token');
+
     fetch(`${API_URL}/api/sales`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(saleData)
     })
     .then(async res => {
@@ -31,8 +35,8 @@ const Cart = ({ cart, removeFromCart, clearCart, user }) => {
         if (!res.ok) throw new Error(data.error || 'Error al procesar el pedido');
         return data;
     })
-    .then(() => {
-      alert('¡✅ Gracias por tu compra! Tu pedido está en camino.');
+    .then((data) => {
+      alert(`¡✅ Gracias por tu compra! Total: S/ ${data.total.toFixed(2)}. Tu pedido está en camino.`);
       clearCart();
       navigate('/');
     })
