@@ -50,7 +50,7 @@ SQLite Database
 
 ## 📸 Vista del sistema
 
-*(Próximamente: Screenshots del sistema en funcionamiento)*
+![Vista Previa de Nova Salud](preview.png)
 
 ---
 
