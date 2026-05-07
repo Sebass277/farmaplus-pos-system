@@ -8,7 +8,14 @@ const { verifyToken, isAdmin } = require('../middleware/auth');
 router.get('/', async (req, res) => {
   try {
     const rows = await dbAsync.all("SELECT * FROM products WHERE status = 'active'");
-    res.json(rows);
+    
+    // Limpiar URLs de imágenes para que funcionen en producción
+    const sanitizedRows = rows.map(prod => ({
+        ...prod,
+        imagen: prod.imagen ? prod.imagen.replace('http://localhost:5000', '') : ''
+    }));
+
+    res.json(sanitizedRows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

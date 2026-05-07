@@ -58,7 +58,11 @@ const Ecommerce = ({ addToCart, socket }) => {
       <div className="card-grid">
         {filteredProducts.map(product => (
           <div key={product.id} className="glass product-card fade-in">
-            <img src={product.imagen} alt={product.nombre} className="product-image" />
+            <img 
+              src={product.imagen.startsWith('http') ? product.imagen : `${API_URL}${product.imagen}`} 
+              alt={product.nombre} 
+              className="product-image" 
+            />
             <div style={{ padding: '4% 0' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-dark)', height: '2.5rem', overflow: 'hidden' }}>{product.nombre}</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '2% 0' }}>{product.unidad}</p>

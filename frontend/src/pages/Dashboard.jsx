@@ -490,7 +490,11 @@ const Dashboard = ({ user, socket }) => {
                                 .map(p => (
                                 <tr key={p?.id} className="fade-in">
                                     <td style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                        <img src={p?.imagen || ''} alt={p?.nombre || 'Producto'} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'contain', background: '#f8faf9' }} />
+                                        <img 
+                                          src={p.imagen.startsWith('http') ? p.imagen : `${API_URL}${p.imagen}`} 
+                                          alt={p.nombre} 
+                                          style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} 
+                                        />
                                         <div>
                                             <p style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-dark)' }}>{p?.nombre || 'Sin nombre'}</p>
                                             <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>ID: {p?.id || '---'}</p>
