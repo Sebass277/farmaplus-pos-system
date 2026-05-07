@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trash2, ShoppingBag, ArrowLeft, CreditCard } from 'lucide-react';
+import API_URL from '../api';
 
 const Cart = ({ cart, removeFromCart, clearCart, user }) => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const Cart = ({ cart, removeFromCart, clearCart, user }) => {
       tipo: 'Ecommerce'
     };
 
-    fetch('http://localhost:5000/api/sales', {
+    fetch(`${API_URL}/api/sales`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(saleData)

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Package, ShoppingBag, BarChart3, AlertTriangle, Eye, Trash2, Plus, Download, X } from 'lucide-react';
+import { Package, ShoppingBag, BarChart3, AlertTriangle, Eye, Trash2, Plus, Download, X, Link as LinkIcon, Settings } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import API_URL from '../api';
 
 const Dashboard = ({ user }) => {
   const [activeTab, setActiveTab] = useState('pos');
@@ -22,13 +23,13 @@ const Dashboard = ({ user }) => {
   }, []);
 
   const fetchProducts = () => {
-    fetch('http://localhost:5000/api/products')
+    fetch(`${API_URL}/api/products`)
       .then(res => res.json())
       .then(data => setProducts(data));
   };
 
   const fetchReports = () => {
-    fetch('http://localhost:5000/api/sales/reports')
+    fetch(`${API_URL}/api/sales/reports`)
       .then(res => res.json())
       .then(data => setReports(data));
   };
@@ -71,7 +72,7 @@ const Dashboard = ({ user }) => {
       tipo: 'Manual'
     };
 
-    fetch('http://localhost:5000/api/sales', {
+    fetch(`${API_URL}/api/sales`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(saleData)
@@ -101,9 +102,7 @@ const Dashboard = ({ user }) => {
 
   const handleAddProduct = (e) => {
     e.preventDefault();
-    // For this demo, we'll send it to the backend. 
-    // I need to create a new route in the backend for this.
-    fetch('http://localhost:5000/api/products', {
+    fetch(`${API_URL}/api/products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newProduct)
@@ -135,6 +134,9 @@ const Dashboard = ({ user }) => {
               </button>
               <button className={`btn-sidebar ${activeTab === 'add' ? 'active' : ''}`} onClick={() => setActiveTab('add')}>
                 <Plus size={20} /> Nuevo Producto
+              </button>
+              <button className={`btn-sidebar ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')} style={{ marginTop: 'auto', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
+                <LinkIcon size={20} /> Puente API
               </button>
             </>
           )}
@@ -260,6 +262,47 @@ const Dashboard = ({ user }) => {
                     </tbody>
                 </table>
             </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <div className="glass fade-in" style={{ maxWidth: '600px', margin: '0 auto', padding: '40px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                <LinkIcon size={48} style={{ color: 'var(--primary)', marginBottom: '15px' }} />
+                <h2>Configuración de Puente API</h2>
+                <p style={{ color: 'var(--text-muted)' }}>Conecta esta web con tu base de datos local en la farmacia.</p>
+            </div>
+            
+            <div style={{ background: '#fff9f0', padding: '15px', borderRadius: '8px', borderLeft: '4px solid var(--secondary)', marginBottom: '25px', fontSize: '0.9rem' }}>
+                <strong>Instrucciones:</strong> Ejecuta <code>ngrok http 5000</code> en tu PC local y pega aquí la URL generada (ej: https://xxxx.ngrok.io).
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <input 
+                    type="text" 
+                    placeholder="https://tu-puente-local.ngrok.io" 
+                    className="input-field" 
+                    id="bridgeUrlInput"
+                    defaultValue={localStorage.getItem('nova_salud_bridge') || ''}
+                />
+                <button 
+                    className="btn-primary" 
+                    onClick={() => {
+                        const val = document.getElementById('bridgeUrlInput').value;
+                        if (val) {
+                            localStorage.setItem('nova_salud_bridge', val);
+                            alert('Enlace guardado. La página se recargará para conectar.');
+                            window.location.reload();
+                        } else {
+                            localStorage.removeItem('nova_salud_bridge');
+                            alert('Enlace eliminado. Se usará la configuración por defecto.');
+                            window.location.reload();
+                        }
+                    }}
+                >
+                    CONECTAR PUENTE
+                </button>
+            </div>
+          </div>
         )}
       </main>
 

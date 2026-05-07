@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Eye, X } from 'lucide-react';
 import Carousel from '../components/Carousel';
+import API_URL from '../api';
 
 const Ecommerce = ({ addToCart }) => {
   const [products, setProducts] = useState([]);
@@ -8,7 +9,7 @@ const Ecommerce = ({ addToCart }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/products')
+    fetch(`${API_URL}/api/products`)
       .then(res => res.json())
       .then(data => setProducts(data));
   }, []);

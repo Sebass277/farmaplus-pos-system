@@ -8,7 +8,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+import API_URL from './api';
+const socket = io(API_URL);
 
 function App() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
