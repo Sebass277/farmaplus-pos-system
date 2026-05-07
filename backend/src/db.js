@@ -120,13 +120,30 @@ function seedDatabase(db) {
 
     db.get("SELECT COUNT(*) as count FROM products", (err, row) => {
         if (row && row.count === 0) {
-            console.log('🌱 Poblando productos iniciales...');
+            console.log('🌱 Poblando catálogo completo (22 productos)...');
             const products = [
-                ['PROD-001', 'Protector Solar Facial en Gel Crema Eucerin Oil Control FPS50+', 95.50, '50ml', '/images/protector.jpg', 100, 10, '7750123456789', 'L-001'],
-                ['PROD-002', 'Repuesto Gel Hidratante Facial Hydro Boost Neutrogena', 65.20, '50g', '/images/neutrogena.jpg', 50, 5, '7750987654321', 'L-002'],
-                ['PROD-003', 'Bismutol 87.33mg/5 ml Suspensión Oral', 18.50, '150ml', '/images/bismutol.jpg', 30, 8, '7750111222333', 'L-003'],
-                ['PROD-004', 'DoloMejoral 550 mg tableta recubierta', 1.50, '1 Tableta', '/images/dolomejoral.jpg', 200, 50, '7750444555666', 'L-004'],
-                ['PROD-005', 'Dolo Neurobion Forte NF', 5.80, '1 Ampolla', '/images/doloneurobion.jpg', 150, 20, '7750777888999', 'L-005']
+                ['PROD-001', 'Protector Solar Facial en Gel Crema Eucerin Oil Control FPS50+', 96.9, 'FRASCO 50 ML', '/images/PROD-001.jpg', 132, 12, '7756708015805', 'L-3396-C'],
+                ['PROD-002', 'Repuesto Gel Hidratante Facial Hydro Boost Neutrogena', 34.9, 'TUBO 50 GR', '/images/PROD-002.jpg', 207, 9, '7751462119604', 'L-3329-A'],
+                ['PROD-003', 'Bismutol 87.33mg/5 ml Suspensión Oral', 26.5, 'FRASCO 340 ML', '/images/PROD-003.jpg', 61, 19, '7754076235787', 'L-8420-B'],
+                ['PROD-004', 'DoloMejoral 550 mg tableta recubierta', 21, 'BLÍSTER 10 UN', '/images/PROD-004.jpg', 116, 15, '7753007720284', 'L-3121-B'],
+                ['PROD-005', 'Dolo Neurobion Forte NF', 12.8, 'BLÍSTER 4 UN', '/images/PROD-005.jpg', 189, 12, '7757771254243', 'L-1060-C'],
+                ['PROD-006', 'Anaflex® Mujer 200Mg Cápsula Blanda', 135, 'CAJA 150 UN', '/images/PROD-006.jpg', 200, 8, '7758181676994', 'L-3789-C'],
+                ['PROD-007', 'Paracetamol 500mg Tableta', 10, 'CAJA 100 UN', '/images/PROD-007.jpg', 175, 8, '7752250699743', 'L-9555-A'],
+                ['PROD-008', 'Cetirizina IQ 10mg Tableta Recubierta', 10, 'CAJA 100 UN', '/images/PROD-008.jpg', 44, 5, '7754412578269', 'L-9482-C'],
+                ['PROD-009', 'Omeprazol 20mg Cápsula de Liberación Retardada', 11.8, 'CAJA 100 UN', '/images/PROD-009.jpg', 23, 15, '7754623367006', 'L-8176-A'],
+                ['PROD-010', 'Paracetamol 500mg Tableta', 10, 'CAJA 100 UN', '/images/PROD-010.jpg', 192, 14, '7754954021563', 'L-2124-A'],
+                ['PROD-011', 'Terbinafina 250mg Tabletas recubiertas', 85, 'CAJA 100 UN', '/images/PROD-011.jpg', 98, 5, '7758258839367', 'L-8009-C'],
+                ['PROD-012', 'Loratadina 10mg', 4.9, 'CAJA 100 UN', '/images/PROD-012.jpg', 157, 16, '7752547783022', 'L-3551-C'],
+                ['PROD-013', 'Ibuprofeno 400mg Tableta recubierta', 13, 'CAJA 100 UN', '/images/PROD-013.jpg', 85, 18, '7751970827320', 'L-4473-A'],
+                ['PROD-014', 'Sulfato Ferroso 300mg Tableta', 10, 'CAJA 100 UN', '/images/PROD-014.jpg', 37, 12, '7751202707857', 'L-6805-B'],
+                ['PROD-015', 'Naproxeno Sódico 550 Mg Tableta Recubierta', 3.8, 'BLÍSTER 10 UN', '/images/PROD-015.jpg', 117, 14, '7752259817472', 'L-9187-B'],
+                ['PROD-016', 'Enterogermina Suspensión Oral', 3.7, 'FRASCO BEBIBLE 1 UN', '/images/PROD-016.jpg', 171, 17, '7756658404983', 'L-3739-C'],
+                ['PROD-017', 'Buscapina Compositum N 10mg/500mg Comprimido Recubierto', 10, 'BLÍSTER 10 UN', '/images/PROD-017.jpg', 29, 19, '7753511362709', 'L-4487-C'],
+                ['PROD-018', 'Caverta 5mg Tableta Recubierta', 72.24, 'CAJA 28 UN', '/images/PROD-018.jpg', 86, 19, '7757568213931', 'L-7864-C'],
+                ['PROD-019', 'Ácido Tranexamico 250mg Cápsula', 30.8, 'CAJA 10 UN', '/images/PROD-019.jpg', 211, 15, '7756381638623', 'L-5800-A'],
+                ['PROD-020', 'Sal De Andrews Clasica Polvo Efervescente Para Solucion Oral', 1, 'UNIDAD 1 UN', '/images/PROD-020.jpg', 180, 16, '7755264180220', 'L-9714-A'],
+                ['PROD-021', 'Bio Electro 250mg + 250mg + 65mg Tableta Recubierta', 80, 'CAJA 100 UN', '/images/PROD-021.jpg', 125, 16, '7755626361831', 'L-6650-B'],
+                ['PROD-022', 'Climadiol 2Mg Tableta Recubierta', 77.7, 'CAJA 30 UN', '/images/PROD-022.jpg', 202, 13, '7751303712354', 'L-6470-C']
             ];
             const stmt = db.prepare("INSERT INTO products (id, nombre, precio, unidad, imagen, stock_actual, stock_minimo, codigo_barras, lote) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             products.forEach(p => stmt.run(p));

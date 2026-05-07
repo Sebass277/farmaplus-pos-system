@@ -24,9 +24,13 @@ const io = new Server(server, {
   }
 });
 
+const path = require('path');
 app.use(morgan('dev')); // Logger de peticiones HTTP
 app.use(cors());
 app.use(express.json());
+
+// Servir imágenes estáticas
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
 // Root route for health check
 app.get('/', (req, res) => {
