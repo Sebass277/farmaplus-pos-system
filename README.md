@@ -14,6 +14,11 @@ Sistema POS + Inventario en tiempo real para farmacia.
 
 </p>
 
+> [!IMPORTANT]
+> **Activación del Sistema:** Debido a que el Backend está alojado en la versión gratuita de Render, este puede "dormirse" tras un periodo de inactividad. 
+> 
+> **Si el Frontend aparece vacío:** Por favor, haz clic primero en el botón de **VER BACKEND** arriba. Una vez que veas el mensaje *"Nova Salud API Server is running"*, refresca el Frontend y todo funcionará perfectamente.
+
 ---
 
 ## 🧠 Tecnologías
